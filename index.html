@@ -1,0 +1,183 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <style>
+        /*If I've been in your class/office before, you know my passionate hatred for serif fonts*/
+        body{
+            font-family: Arial, Verdana, sans-serif;
+        }
+    </style>
+    <title>J Swanson's Random Text Generator</title>
+</head>
+<body>
+    <div id="thisDiv">
+        Text goes here! If you don't have JS, you're seeing this!
+    </div>
+</body>
+<script>
+    /*
+    * Self-invoking test code
+    * */
+    (function(){
+        generateText(document.getElementById("thisDiv"), null, 51, null);
+    })();
+
+    /*
+    * WELCOME TO THE J.SWANSON RANDOM TEXT GENERATOR!
+    * Author: J.Candelaria, former student
+    * If you're students of Swanson's intro CS Class, you've seen this text before.
+    * Now you can have it on your own site. Just carefully read the coffee-fueled haphazard
+    * documentation or just copypasta what you see on this page.
+    * */
+
+
+    /*
+    * generateText: generates random sentences using the words
+    * provided in the dictionary.
+    * @param: div- the target div receiving the text
+    * @param: divarray- a collection of divs receiving the text
+    *   if div is not null, then this parameter will be ignored
+    * @param: the approximate length of the block of text (it may be bigger or smaller)
+    * @param: specificLengths: THIS IS TO ONLY BE USED WITH MULTIPLE DIVS. IT SHALL BE AN ARRAY
+    * FOR EVERY DIV IN DIVARRAY, THE SPECIFIC LENGTHS WILL BE ADVANCED. IT IS PADDED AS A CYCLICAL
+    * ARRAY.
+    * @return:
+    *   if divarray is not null, then this parameter will be an empty string
+    */
+    function generateText(div, divArray, averageLength, specificLengths){
+        //Configuration!:
+        /*
+        * TODO: Document this JSON!
+        * */
+        var dictionary = {
+            "words": [
+                "blah",
+                "lah",
+                "ba",
+                "ah"
+            ],
+            "sentences" : {
+                "sentenceLengthAverage" : 4,
+                "sentenceLengthVariance" : 2
+            },
+            "debug" : true
+        };
+
+        //Programming logic and functions:
+        /*
+        * It is highly recommended that you don't mess with this code.
+        * You have been warned, but then again if you're here, you're in a CS
+        * class and this thing is on Github, so go ahead. Some docs are in there, but
+        * the extent of documentation varies proportionally to the level
+        * of caffeine in my bloodstream. You have been warned.
+        *
+        *
+        */
+        if(dictionary.debug){
+            //starting debug messages
+            console.log("Swanson has begun....in debug mode!");
+            if(dictionary.sentences.sentenceLengthVariance
+                    >= dictionary.sentences.sentenceLengthAverage){
+                console.log("Sentence variance is >= sentence length. Brace yourself, weird bugs are incoming...");
+            }
+        }else{
+            console.log("Swanson has begun...");
+        }
+        //validate dictionary word/sentence parameters and display them to debugger if needed
+        var getTotalLetters = 0;
+        for(var i = 0; i < dictionary.words.length;i++){
+            getTotalLetters+= dictionary.words[i].length;
+        }
+        var getAverageLetters = getTotalLetters/dictionary.words.length;
+        if(dictionary.debug){
+            console.log("Avg length of letters in your word bank is: " + getAverageLetters);
+        }
+        validateArgs();
+
+        function validateArgs(){
+            //args: div, divArray, averageLength, specificLengths
+            if((div != undefined || divArray != undefined) && averageLength != undefined){
+                if(div != undefined){
+                    div.innerHTML = generateTextBlock(averageLength);
+                }
+            }
+            /*
+            * TODO: Finish the input scenarios
+            * */
+            if(div == undefined && divArray != undefined && (averageLength != undefined && specificLengths != undefined)){
+
+            }
+        }
+
+        function generateTextBlock(textLength){
+            if(dictionary.debug){
+                console.log("Generating Text block of: " + textLength);
+            }
+            var totalSentences = Math.floor(textLength/dictionary.sentences.sentenceLengthAverage);
+            if(dictionary.debug){
+                console.log("Generating " + totalSentences + " sentences");
+            }
+            var returnText = "";
+            for(var i = 0; i < totalSentences; i++){
+                var sentence = "";
+                var sentenceLength = getSentenceLength();
+                for(var j= 0; j < sentenceLength; j++){
+                    if(j == 0){
+                        sentence += capitalizeWord(getRandomWord());
+                    }else if(j == sentenceLength - 1){
+                        sentence += " " + endSentence(getRandomWord())
+                    }else{
+                        sentence += " " + getRandomWord();
+                    }
+                }
+                returnText += sentence;
+            }
+            return returnText;
+        }
+
+        /*
+        * Returns a random word from your dictionary. Weight and fequency will be added:
+        * TODO: Add weight and frequency features to dictionary word table
+        * */
+        function getRandomWord(){
+            var randomWord = dictionary.words[Math.floor(Math.random() * dictionary.words.length)];
+            if(dictionary.debug){
+                console.log(randomWord);
+            }
+            return randomWord;
+        }
+
+        /*
+        * Takes the given word and returns the word with the first letter capitalized.
+        * This is to mimic the start of a sentence
+        * */
+        function capitalizeWord(word){
+            return word.charAt(0).toUpperCase() + word.slice(1);
+        }
+
+        /*
+         * Takes the given word and returns the word with a period at the end.
+         * This is to mimic the end of a sentence
+         * */
+        function endSentence(word){
+            return word + ". ";
+        }
+
+        /*
+        * Returns a random int sentence length between setenceLengthAverage +-
+        * sentenceLengthVariance
+        * */
+        function getSentenceLength(){
+            var sentenceLength= (dictionary.sentences.sentenceLengthAverage +
+                dictionary.sentences.sentenceLengthVariance) -
+                Math.floor(Math.random() *
+                ((dictionary.sentences.sentenceLengthVariance * 2) + 1));
+            if(dictionary.debug){
+                console.log("Sentence Length: " + sentenceLength);
+            }
+            return sentenceLength;
+        }
+    }
+</script>
+</html>
