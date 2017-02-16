@@ -48,11 +48,18 @@
     function generateText(div, divArray, averageLength, specificLengths){
         //Configuration!:
         /*
-        * TODO: Document this JSON!
+        * dictionary: main config object:
+        * words: array of words used. Default weight is 1.
+        *   However, if you want to weigh the words differently, replace the element with an array
+        *   like so: ["word", 3]. 'word' will have a weight of 4.
+        * sentences: play with the sentence structure:
+        *   sentenceLengthAverage - average length of generated sentence
+        *   sentenceLengthVariance - the sentences will vary between the length average +- this amount
+        * debug: getting errors? Every step is output to the console. Determine where you broke it.
         * */
         var dictionary = {
             "words": [
-                "blah",
+                ["blah",3],
                 "lah",
                 "ba",
                 "ah"
@@ -71,12 +78,11 @@
         * class and this thing is on Github, so go ahead. Some docs are in there, but
         * the extent of documentation varies proportionally to the level
         * of caffeine in my bloodstream. You have been warned.
-        *
-        *
         */
         if(dictionary.debug){
             //starting debug messages
             console.log("Swanson has begun....in debug mode!");
+            //validate dictionary word/sentence parameters and display them to debugger if needed
             if(dictionary.sentences.sentenceLengthVariance
                     >= dictionary.sentences.sentenceLengthAverage){
                 console.log("Sentence variance is >= sentence length. Brace yourself, weird bugs are incoming...");
@@ -84,17 +90,45 @@
         }else{
             console.log("Swanson has begun...");
         }
-        //validate dictionary word/sentence parameters and display them to debugger if needed
-        var getTotalLetters = 0;
-        for(var i = 0; i < dictionary.words.length;i++){
-            getTotalLetters+= dictionary.words[i].length;
-        }
-        var getAverageLetters = getTotalLetters/dictionary.words.length;
+        var getAverageLetters = computeAverageWordLength();
         if(dictionary.debug){
             console.log("Avg length of letters in your word bank is: " + getAverageLetters);
         }
         validateArgs();
 
+        /*
+        * @returns the average (weighted) length of a word in the dictionary
+        * */
+        function computeAverageWordLength(){
+            //getTotalLetters/dictionary.words.length;
+
+            var getWeightedLetters = 0;
+            for(var j = 0; j < dictionary.words.length; j++){
+                if(Array.isArray(dictionary.words[j])){
+                    getWeightedLetters+= (dictionary.words[j][0].length * dictionary.words[j][1]);
+                }else{
+                    getWeightedLetters+= (dictionary.words[j].length);
+                }
+            }
+            if(dictionary.debug){
+                console.log("Weighted letter count: " + getWeightedLetters);
+            }
+            var getWeightedWordCount = 0;
+            for(var k = 0; k < dictionary.words.length; k++){
+                if(Array.isArray(dictionary.words[k])){
+                    getWeightedWordCount += dictionary.words[k].length;
+                }else{
+                    getWeightedWordCount += 1;
+                }
+            }
+            return getAverageLetters/getWeightedWordCount;
+        }
+
+
+        /*
+        * Validating the arguments given to the JS module to determine the appropriate procedure:
+        *
+        * */
         function validateArgs(){
             //args: div, divArray, averageLength, specificLengths
             if((div != undefined || divArray != undefined) && averageLength != undefined){
@@ -110,6 +144,12 @@
             }
         }
 
+        /*
+        * Heart of the program. The random block of text generator.
+        * @param textLength: the number of words to shoot for.
+        * Determines the average of word lenghts to determine
+        *
+        * */
         function generateTextBlock(textLength){
             if(dictionary.debug){
                 console.log("Generating Text block of: " + textLength);
@@ -137,11 +177,22 @@
         }
 
         /*
-        * Returns a random word from your dictionary. Weight and fequency will be added:
-        * TODO: Add weight and frequency features to dictionary word table
+        * Returns a random word form the dictionary. Dictionary is weighted by array values in dictionary
         * */
         function getRandomWord(){
-            var randomWord = dictionary.words[Math.floor(Math.random() * dictionary.words.length)];
+            var weightedDictionary = [];
+            for (var i = 0; i < dictionary.words.length; i++){
+                if(Array.isArray(dictionary.words[i])){
+                    for(var j =0; j < dictionary.words[i][1]; j++){
+                        weightedDictionary.push(dictionary.words[i][0]);
+                    }
+                }
+                else{
+                    weightedDictionary.push(dictionary.words[i]);
+                }
+            }
+            var randomWord = weightedDictionary[Math.floor(Math.random()
+                * weightedDictionary.length)];
             if(dictionary.debug){
                 console.log(randomWord);
             }
