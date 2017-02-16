@@ -149,7 +149,10 @@
         /*
         * Heart of the program. The random block of text generator.
         * @param textLength: the number of words to shoot for.
-        * Determines the average of word lenghts to determine
+        * Looks at weighted averages of possible word/sentence combos to 
+        * determine the number of sentences to generate. Generates them 
+        * accordingly by picking from the dictionary with respect to their weights
+        * (if applicable). Returns the block of generated text.
         *
         * */
         function generateTextBlock(textLength){
